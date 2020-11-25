@@ -1,39 +1,23 @@
 package leego
 
 import (
-	"net/http"
 	"testing"
 )
 
 func TestEngine(t *testing.T) {
 	router := NewEngine()
+	router.GET("/get", func(ctx *Context) {
+		t.Log(ctx.Method, ctx.Path)
+		t.Log(ctx.Query("name"))
+		ctx.ResponseBytes(200, []byte(ctx.Path))
+	})
+	router.POST("/post", func(ctx *Context) {
+		t.Log(ctx.Method, ctx.Path)
+		ctx.ResponseString(200, "/post/"+ctx.Query("name"))
 
-	router.GET("/get", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("GET"))
 	})
-	router.POST("/post", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("post"))
-	})
-	router.PUT("/put", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("put"))
-	})
-	router.PATCH("/patch", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("patch"))
-	})
-	router.DELETE("/delete", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("delete"))
-	})
-	router.HEAD("/head", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(211)
-	})
-	router.OPTIONS("/options", func(resp http.ResponseWriter, req *http.Request) {
-		resp.WriteHeader(200)
-		resp.Write([]byte("options"))
+	router.PUT("/put", func(ctx *Context) {
+		ctx.ResponseString(200, "PUT /put")
 	})
 
 	router.ListenAndServe(":8080")

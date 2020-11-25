@@ -10,6 +10,8 @@
   - 快速使用
   - API 示例
     - 使用 GET、POST、PUT、DELETE、PATCH、HEAD 和 OPTIONS 请求方法
+    - 查询路由中的请求参数
+    - 获取表单中的请求参数
 
 ## 安装
 
@@ -60,7 +62,41 @@ func main() {
 	router.PATCH("/somePatch", patching)
 	router.HEAD("/someHead", head)
 	router.OPTIONS("/someOptions", options)
+    
+	router.ListenAndServe(":8080")
+}
+```
 
+### 查询路由中的请求参数
+
+```go
+func main() {
+	router := leego.Engine()
+    
+    //请求URL：/index?name=xxx&age=yyy
+	router.GET("/index", func(ctx *leego.Context) {
+		name := ctx.Query("name")
+        age := ctx.Query("age")
+        ctx.ResponseString(http.StatusOK, "hello " + name)
+	})
+	router.ListenAndServe(":8080")
+}
+```
+
+### 获取表单中的请求参数
+
+```go
+func main() {
+	router := leego.Engine()
+
+	router.POST("/form", func(ctx *leego.Context) {
+		info := ctx.GetPostForm("info")
+
+		ctx.ResponseJson(200, leego.J{
+            "name":name,
+            "age":age,
+		})
+	})
 	router.ListenAndServe(":8080")
 }
 ```
