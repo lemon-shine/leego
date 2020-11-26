@@ -21,7 +21,7 @@ func newRouter() *router {
 	}
 }
 
-//addRoute：添加请求路由到路由器中
+//addRoute：添加请求路由到处理器中
 func (self *router) addRoute(method, path string, handler HandleFunc) {
 	log.Printf("Route %4s - %s", method, path)
 	key := method + "-" + path

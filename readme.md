@@ -12,6 +12,7 @@
     - 使用 GET、POST、PUT、DELETE、PATCH、HEAD 和 OPTIONS 请求方法
     - 查询路由中的请求参数
     - 获取表单中的请求参数
+    - 使用路由分组
 
 ## 安装
 
@@ -100,3 +101,24 @@ func main() {
 	router.ListenAndServe(":8080")
 }
 ```
+
+### 使用路由分组
+
+```go
+func main() {
+	router := leego.Engine()
+
+	router.GET("/form", func(ctx *leego.Context) {
+		info := ctx.GetPostForm("info")
+
+	})
+    
+    admin := router.Group("/admin")
+    admin.GET("/get", func(ctx *leego.Context) {
+        ctx.ResponseBytes(200, []byte("/get"))
+	})
+    
+	router.ListenAndServe(":8080")
+}
+```
+

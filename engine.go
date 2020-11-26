@@ -1,7 +1,7 @@
 /*******************************************************************************
-实现：引擎模块
+模块：引擎
 作者：Lemine
-时间：2020/03/03
+时间：2020/03/07
 *******************************************************************************/
 package leego
 
@@ -14,11 +14,16 @@ type HandleFunc func(*Context)
 
 //定义引擎，用于处理所有HTTP请求
 type Engine struct {
-	router *router
+	*RouteGroup               //继承路由组，用于创建分组
+	router      *router       //路由器
+	groups      []*RouteGroup //路由组
 }
 
 func NewEngine() *Engine {
-	return &Engine{router: newRouter()}
+	engine := &Engine{router: newRouter()} //新建一个路由器
+	engine.RouteGroup = &RouteGroup{engine: engine}
+	engine.groups = []*RouteGroup{engine.RouteGroup} //不同路由组
+	return engine
 }
 
 //GET：处理GET请求
@@ -56,13 +61,13 @@ func (self *Engine) OPTIONS(path string, handler HandleFunc) {
 	self.router.addRoute("OPTIONS", path, handler)
 }
 
-//ListenAndServe：运行服务引擎
+//Run：运行服务引擎
 func (self *Engine) ListenAndServe(addr string) error {
 	return http.ListenAndServe(addr, self)
 }
 
 //ServeHTTP：实现http.Hanlder接口，处理所有的路由请求
-func (self *Engine) ServeHTTP(wr http.ResponseWriter, req *http.Request) {
-	ctx := NewContext(wr, req)
+func (self *Engine) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	ctx := NewContext(resp, req)
 	self.router.handle(ctx)
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
 模块：上下文
 作者：Lemine
-时间：2020/03/03
+时间：2020/03/07
 *******************************************************************************/
 package leego
 
@@ -29,22 +29,29 @@ type Context struct {
 }
 
 func NewContext(resp http.ResponseWriter, req *http.Request) *Context {
-	return &Context{
+	ctx := &Context{
 		Response: resp,
 		Request:  req,
 		Path:     req.URL.Path,
 		Method:   req.Method,
 	}
+
+	ctx.init()
+	return ctx
 }
 
-//Query：查询URL请求参数
+func (self *Context) init() {
+	self.Request.ParseForm()
+}
+
+//Query：查询URL参数
 func (self *Context) Query(key string) string {
 	return self.Request.URL.Query().Get(key)
 }
 
 //GetPostForm：获取POST表单
 func (self *Context) GetPostForm(key string) string {
-	return self.Request.FormValue(key)
+	return self.Request.PostFormValue(key)
 }
 
 //SetStatus：设置响应状态码
