@@ -6,28 +6,22 @@ import (
 
 func TestEngine(t *testing.T) {
 	router := NewEngine()
-
-	router.GET("/get", func(ctx *Context) {
-		t.Log(ctx.Method, ctx.Path)
-		ctx.ResponseBytes(200, []byte("/get"))
-	})
-	router.POST("/post", func(ctx *Context) {
-		t.Log(ctx.Method, ctx.Path)
-		ctx.ResponseFormatString(200, "/post/%s", ctx.Query("name"))
+	router.GET("/", func(ctx *Context) {
+		ctx.ResponseString(200, "wellcome")
 	})
 
-	admin := router.Group("/admin")
-	admin.PUT("/put", func(ctx *Context) {
-		t.Log(ctx.Method, ctx.Path)
-		ctx.ResponseJson(200, J{
-			"name": ctx.GetPostForm("name"),
-			"age":  ctx.GetPostForm("age"),
-		})
-	})
-	admin.OPTIONS("/options", func(ctx *Context) {
-		t.Log(ctx.Method, ctx.Path)
-		ctx.ResponseString(200, "/options")
+	group := router.NewGroup("/aaa")
+	group.AddMiddlewares(Logger(), Authenticate(&Auth{Username: "123", Password: "123"}))
+	group.GET("/bbb", func(ctx *Context) {
+		ctx.ResponseString(200, "hello")
 	})
 
+	group.GET("/ccc", func(ctx *Context) {
+		ctx.ResponseString(200, ctx.Query("username"))
+	})
+
+	group.GET("/file/:file_id/download", func(ctx *Context) {
+		ctx.ResponseString(200, ctx.GetParam("file_id"))
+	})
 	router.ListenAndServe(":8080")
 }
